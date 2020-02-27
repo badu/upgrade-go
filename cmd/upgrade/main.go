@@ -54,7 +54,7 @@ func SelectVersion() (string, error) {
 	// create the raw list to be used in prompt
 	var versionsRaw []string
 	for _, ver := range versions {
-		versionsRaw = append(versionsRaw, ver.String())
+		versionsRaw = append(versionsRaw, ver.Original())
 	}
 
 	prompt := promptui.Select{Label: "Select Version", Items: versionsRaw}
@@ -132,7 +132,9 @@ func DownloadArchive(fromURL, toFilePath string) {
 		log.Fatalf("download failed : %v", err)
 	}
 	defer resp.Body.Close()
-
+	if resp.StatusCode != 200 {
+		log.Fatalf("Something went wrong : http status is %d", resp.StatusCode)
+	}
 	// Create the file
 	out, err := os.Create(toFilePath)
 	if err != nil {
